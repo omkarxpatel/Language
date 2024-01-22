@@ -1,0 +1,21 @@
+funct functionName (args:[type ARG1 | type ARG2 ...]) -> returnType {
+    // code
+}
+
+// add function, iterates from 0 to a, calculates sum, does the same for b, adds both together & returns
+
+// arg types and return types not neccesary
+funct add (args:[int a | int b]) -> int {
+    sum = 0; // defaults as type int
+    
+    // can be replaced with "for (i | ...)" because defaults as int and 0
+    for (int i = 0 | until i < a i++ ) {
+        sum += i;
+    }
+
+    for (int i = 0 | until i < b i++ ) {
+        sum += i;
+    }
+
+    return sum;
+}
