@@ -7,7 +7,8 @@ from colorama import Fore as f, init
 class Lexer:    
     def __init__(self):
         init(autoreset=True)
-        self.execution = time.time()
+        self.overall = time.time()
+        self.execution = self.overall
         
         self.currentPosition = 0
 
@@ -19,8 +20,6 @@ class Lexer:
             # reserved words
             "cout": "PRINT",
             "coutln": "PRINTLN",
-            # "for": "FOR",
-            # "until": "UNTIL",
             
             # quotes
             '\"': r'\"', 
@@ -47,8 +46,6 @@ class Lexer:
             r"[a-z]+": "STRING",
             r"[A-Z]+": "STRING",
             "print": "PRINT",
-            # "for": "FOR",
-            # "until": "UNTIL",
             
             # quotes
             r'\"': "QUOTE",
@@ -74,13 +71,17 @@ class Lexer:
             "PRINT": "print",
             "PRINTLN": "print*",
             "COMMENT": "# ",
-            # "until": " ",
+        }
+        
+        self.syntaxTree = {
+            # "PRINT": "cout(\"\'_\"\')",
+            "PRINT": "cout(\"_\")",
         }
         
         self.tokens = []
 
     def setupKeywords(self) -> None:
-        print("-"*65)
+        print("-"*30)
         keywordConfiguration = {
             '0123456789': r'\d+',
             'abcdefghijklmnopqrstuvwxyz': r'[a-z]+',
@@ -125,8 +126,9 @@ class Lexer:
                 self.tokens.append([token.group(0), tokenType])
                 
                 spaces = " "*(5-len(str(operations)))
-                spaces2 = " "*(45-len(str(token)))
-                print(f"{operations}{spaces}|  {token}{spaces2}|  {tokenType}")
+                spaces2 = " "*(10-len(str(token.group(0))))
+                # print(f"{operations}{spaces}|  {token}{spaces2}|  {tokenType}")
+                print(f"{operations}{spaces}|  {token.group(0)}{spaces2}|  {tokenType}")
                 
             except:
                 print(".",currentCharacter,".")
@@ -134,9 +136,8 @@ class Lexer:
         
             operations += 1
             
-        print("-"*65)
+        print("-"*30)
         return operations
-    
     
     def parser(self, tokens) -> str:
         self.execution = time.time()
@@ -181,10 +182,12 @@ class Lexer:
             else:
                     checker = self.doubleChecking.get(parsedValue) or None # for double characters like // (comment)
                     if checker:
-                        nextToken = tokens[operations-1][0]
+                        nextToken = tokens[operations+1][0]
+                        
                         if (nextToken+parsedValue == checker):
-                            # i+=1
                             result += self.antiKeyword.get(self.keywordTypes.get(checker))
+                        else:
+                            result += checker
                     else:
                         result += parsedValue
                 
@@ -202,6 +205,10 @@ class Lexer:
             
         return [result, operations]
     
+    def checkSyntax(self, argument) -> bool:
+        # check with syntax tree
+        print(self.syntaxTree.get("PRINT"))
+        
     
     def save_to_py_file(self, python_code, output_file='output.py'):
         with open(output_file, 'w') as py_file:
@@ -210,6 +217,7 @@ class Lexer:
         
     def main(self, value) -> None:
         os.system('clear')
+        # self.checkSyntax("")
         print(f"{f.RED}Input File:\n\n{f.RESET}{value}\n\n")
         
         # Compute the source file into tokens
@@ -227,8 +235,8 @@ class Lexer:
         # Evaluate the python code
         self.execution = time.time()
         print(f"\n\n{f.RED}Process 3 - Execution (output):\n")
-        exec(evaluation[0]) # python built in function
-        print(f"\nExecution Time: {round(time.time()-self.execution, 7)}")
+        exec(evaluation[0]) # python execute
+        print(f"\nExecution Time: {round(time.time()-self.overall, 7)}s")
         
         
 if __name__ == "__main__":
