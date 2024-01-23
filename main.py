@@ -147,6 +147,11 @@ class Lexer:
         return [result, operations]
     
     
+    def save_to_py_file(self, python_code, output_file='output.py'):
+        with open(output_file, 'w') as py_file:
+            py_file.write(python_code)
+        print(f"Saved to {output_file}")    
+        
     def main(self, value) -> None:
         os.system('clear')
         print(f"{f.RED}Input File:\n\n{f.RESET}{value}\n\n")
@@ -160,7 +165,8 @@ class Lexer:
         # Compute the tokens into python code
         print(f"\n\n{f.RED}Process 2 - Parser:")
         evaluation = self.parser(self.tokens)
-        print(evaluation[0])
+        # print(evaluation[0])
+        self.save_to_py_file(evaluation[0])
         print(f"\nExecution time: {round(time.time()-self.execution, 7)}s\nOperations: {evaluation[1]}")
         
         # Evaluate the python code
