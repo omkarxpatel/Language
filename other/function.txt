@@ -9,7 +9,7 @@ funct add (args:[int a | int b]) -> int {
     sum = 0; // defaults as type int
     
     // can be replaced with "for (i | ...)" because defaults as int and 0
-    for (int i = 0 | until i < a i++ ) {
+    for (int i = 0 | i++ until i < a ) {
         sum += i;
     }
 

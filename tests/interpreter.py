@@ -1,7 +1,10 @@
 import re, os, sys, time
+from colorama import Fore as f, init
 
 class Lexer():
     def __init__(self):
+        init(autoreset=True) # fore
+        
         self.tokens = []
         self.currentPosition = 0
         self.execution = 0
@@ -21,6 +24,7 @@ class Lexer():
             r'\)': 'CLOSEPARENTHESIS',
             
             r'\for': 'LOOP',
+            r'\print': 'PRINT',
         }
         
         self.charToRegex = {
@@ -42,8 +46,11 @@ class Lexer():
             
         self.lookup["\n"] = r'\n'
         self.lookup["for"] = r'\for'
+        self.lookup["print"] = r'\print'
         self.lookup["("] = r'\('
         self.lookup[")"] = r'\)'
+        self.lookup["\s+"] = r'\s+'
+        print(self.lookup)
         
     
     def tokenizer(self, value):
@@ -51,26 +58,30 @@ class Lexer():
         operations = 0
 
         while (self.currentPosition < len(value)):
-            character = value[self.currentPosition]
-            pattern = self.lookup[character]
-            tokenType = self.patterns[pattern]
+            try:
+                character = value[self.currentPosition]
+                pattern = self.lookup[character]
+                tokenType = self.patterns[pattern]
+                regex = re.compile(pattern)
+                match = regex.match(value, self.currentPosition)
+                spaces = (4 - len(str(self.currentPosition))) * " "
 
-            regex = re.compile(pattern)
-            match = regex.match(value, self.currentPosition)
-            spaces = (4 - len(str(self.currentPosition))) * " "
+                print(f"{f.GREEN} {self.currentPosition}{spaces}|  {match} ({tokenType})")
+                if not match:
+                    raise ValueError(f"Invalid token at position {self.currentPosition}")
 
-            print(f"{self.currentPosition}{spaces}|  {match} ({tokenType})")
-            if not match:
-                raise ValueError(f"Invalid token at position {self.currentPosition}")
-
-            self.tokens.append((f"Value: {match.group(0)}", tokenType))
-            self.currentPosition = match.end()
+                self.tokens.append((f"Value: {match.group(0)}", tokenType))
+                self.currentPosition = match.end()
+            except:
+                spaces = (4 - len(str(self.currentPosition))) * " "
+                print(f" {f.RED}{self.currentPosition}{spaces}|  UNKOWN CHARACTER: \"{value[self.currentPosition]}\"")
+                self.currentPosition += 1
 
             operations += 1
 
         return operations        
         
-    def evaluate_expression(self):
+    def math_evaluation(self):
         stack = []
         operations = {
             'PLUS': '+',
@@ -100,13 +111,13 @@ class Lexer():
     def main(self, value, output):
         os.system('clear')
         result = self.tokenizer(value)
-        calculated_output = self.evaluate_expression()
+        calculated_output = self.math_evaluation()
 
         spacer = "-"
         # output = self.evaluate_expression()
         print(f"{50*spacer}\nInput: {value}\nOutput: {calculated_output[-1]}\nLiteral: {calculated_output[0]}\n")        
         
-        print(f"Execution time: {round(time.time()-self.execution, 5)}s\nOperations: {result}\n\n{self.tokens}")
+        print(f"Execution time: {round(time.time()-self.execution, 7)}s\nOperations: {result}\n\n{self.tokens}")
     
         
 if __name__ == "__main__":
