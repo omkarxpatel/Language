@@ -15,3 +15,15 @@ turns into:
 for i in range(0, 10):
     ...
     i += 1
+
+
+---
+
+
+
+
+for (int i = 0 | i++ until i==10) {
+        
+}
+
+for i in range(0, 10)

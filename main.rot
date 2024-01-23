@@ -1,4 +1,5 @@
-cout("hello world")
-cout('hi again')
-
-cout('hello worlddd')
+cout("hi")
+coutln("bye")
+coutln("haisd")
+cout('hi')
+coutln(5 == 5)

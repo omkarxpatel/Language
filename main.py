@@ -11,23 +11,34 @@ class Lexer:
         
         self.currentPosition = 0
 
-        # self.breakingPoints = {
-        #     " ": "WHITESPACE",
-        #     r"\;": "SEMICOLON",
-        # }
+        self.doubleChecking = {
+            # comments
+            "/": "//"
+        }
         self.lookupKeyword = { # .rot syntax
             # reserved words
             "cout": "PRINT",
+            "coutln": "PRINTLN",
+            # "for": "FOR",
+            # "until": "UNTIL",
             
             # quotes
             '\"': r'\"', 
             "\'": r"\'",
             
-            #special symbols
+            # arithmatic operators
+            "+": r"\+",
+            "-": r"\-",
+            "*": r"\*",
+            "/": r"\/",
+            
+            # special symbols
             "(": r"\(",
             ")": r"\)",
             " ": r"\s+",
             "\n": r"\n",
+            "=": r"\=",
+            "//": r"//",
         }
 
         self.keywordTypes = { # values to token types
@@ -36,31 +47,34 @@ class Lexer:
             r"[a-z]+": "STRING",
             r"[A-Z]+": "STRING",
             "print": "PRINT",
+            # "for": "FOR",
+            # "until": "UNTIL",
             
             # quotes
             r'\"': "QUOTE",
             r'\'': "SINGLE_QUOTE",
+            
+            # arithmatic operators
+            r"\+": "ADDITION",
+            r"\-": "SUBTRACTION",
+            r"\*": "MULTIPLICATION",
+            r"\/": "DIVISION",
+            r"\=": "SETVALUE",
             
             # special symbols
             r"\(": "L_PAREN",
             r"\)": "R_PAREN",
             r"\s+": "SPACE",
             r"\n": "NEWLINE",
+            r"//": "COMMENT"
         }
         
-        self.antiKeyword = { # token types to python
+        self.antiKeyword = { # token types to python, only requires different syntax
             # reserved words
             "PRINT": "print",
-            
-            # quotes
-            "QUOTE": "\"",
-            "SINGLE_QUOTE": "\'",
-            
-            # special symbols
-            "L_PAREN": "(",
-            "R_PAREN": ")",
-            "SPACE": " ",
-            "NEWLINE": "\n",
+            "PRINTLN": "print*",
+            "COMMENT": "# ",
+            # "until": " ",
         }
         
         self.tokens = []
@@ -108,7 +122,7 @@ class Lexer:
                     tokenType = "UNKNOWN"
                     
                 self.currentPosition = token.end()
-                self.tokens.append((token.group(0), tokenType))
+                self.tokens.append([token.group(0), tokenType])
                 
                 spaces = " "*(5-len(str(operations)))
                 spaces2 = " "*(45-len(str(token)))
@@ -127,17 +141,59 @@ class Lexer:
     def parser(self, tokens) -> str:
         self.execution = time.time()
         operations = 0
+        backtrack = 0 # used just for println
+        idx = 0
         result = ""
         
         print("-"*30)
         for value, tokenType in tokens:
             parsedValue = self.antiKeyword.get(tokenType) or value
-            result += parsedValue
+            
+            if len(parsedValue) != 1:
+                if parsedValue == "print": # checks for newline at end
+                    openParenthesis = 0
+                    
+                    for i in range(idx, len(tokens)):
+                        token = tokens[i][-1]
+                        
+                        if token == "L_PAREN":
+                            openParenthesis += 1
+                        elif token == "R_PAREN":
+                            openParenthesis -= 1
+                            
+                            if openParenthesis == 0:
+                                temp = [", end=\"\"", "ENDL"]
+                                tokens.insert(i, temp)
+                                idx = i+2
+                                break
+                            
+                elif parsedValue == "print*":
+                    parsedValue = parsedValue.strip("*")
+                
+            if parsedValue == "print":
+                try:
+                    if result[-5:] == "print":
+                        pass
+                    else:
+                        result += parsedValue
+                except:
+                    pass
+            else:
+                    checker = self.doubleChecking.get(parsedValue) or None # for double characters like // (comment)
+                    if checker:
+                        nextToken = tokens[operations-1][0]
+                        if (nextToken+parsedValue == checker):
+                            # i+=1
+                            result += self.antiKeyword.get(self.keywordTypes.get(checker))
+                    else:
+                        result += parsedValue
+                
             operations += 1
             
-            if value == "\n" or parsedValue == "\n" or tokenType == "SPACE":
+            if parsedValue == "\n" or tokenType == "SPACE":
                 value, parsedValue = repr(value), repr(parsedValue)
-            
+
+                
             spaces = " "*(5-len(str(operations)))
             spaces2 = " "*(10-len(value))
 
@@ -165,13 +221,14 @@ class Lexer:
         # Compute the tokens into python code
         print(f"\n\n{f.RED}Process 2 - Parser:")
         evaluation = self.parser(self.tokens)
-        # print(evaluation[0])
         self.save_to_py_file(evaluation[0])
         print(f"\nExecution time: {round(time.time()-self.execution, 7)}s\nOperations: {evaluation[1]}")
         
         # Evaluate the python code
+        self.execution = time.time()
         print(f"\n\n{f.RED}Process 3 - Execution (output):\n")
         exec(evaluation[0]) # python built in function
+        print(f"\nExecution Time: {round(time.time()-self.execution, 7)}")
         
         
 if __name__ == "__main__":

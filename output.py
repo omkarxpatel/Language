@@ -1,4 +1,5 @@
-print("hello world")
-print('hi again')
-
-print('hello worlddd')
+print("hi", end="")
+print("bye")
+print("haisd")
+print('hi', end="")
+print(5 == 5)
