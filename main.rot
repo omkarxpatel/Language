@@ -1,4 +1,15 @@
-// cout(10/5) 
-coutln(40)
-cout(10)
-cout("hi"*5)
+funct hi(x | y) {
+    if (x > y) {
+        coutln(x)
+    }
+
+    elseif (x == y) {
+        coutln("same")
+    }
+
+    else {
+        coutln(y)
+    }
+}
+
+hi(10 | 10)

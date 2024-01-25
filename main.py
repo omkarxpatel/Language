@@ -20,6 +20,10 @@ class Lexer:
             # reserved words
             "cout": "PRINT",
             "coutln": "PRINTLN",
+            "funct": "FUNCTION",
+            "elseif": "ELSEIF",
+            "if": r"\if",
+            "else": r"\else",
             
             # quotes
             '\"': r'\"', 
@@ -30,6 +34,8 @@ class Lexer:
             "-": r"\-",
             "*": r"\*",
             "/": r"\/",
+            "<": r"\<",
+            ">": r"\>",
             
             # special symbols
             "(": r"\(",
@@ -38,14 +44,20 @@ class Lexer:
             "\n": r"\n",
             "=": r"\=",
             "//": r"//",
+            "|": r"\|",
+            "{": r"\{",
         }
 
-        self.keywordTypes = { # values to token types
+        self.keywordTypes = { # syntax to token types
             # reserved words
             r"\d+": "NUMBER",
             r"[a-z]+": "STRING",
             r"[A-Z]+": "STRING",
             "print": "PRINT",
+            "funct ": "FUNCTION",
+            r"\if": "IF",
+            r"\else": "ELSE",
+            r"\elseif": "ELIF",
             
             # quotes
             r'\"': "QUOTE",
@@ -57,13 +69,17 @@ class Lexer:
             r"\*": "MULTIPLICATION",
             r"\/": "DIVISION",
             r"\=": "SETVALUE",
+            r"\<": "LESSTHAN",
+            r"\>": "GREATERTHAN",
             
             # special symbols
             r"\(": "L_PAREN",
             r"\)": "R_PAREN",
             r"\s+": "SPACE",
             r"\n": "NEWLINE",
-            r"//": "COMMENT"
+            r"//": "COMMENT",
+            r"\|": "COMMA",
+            r"\{": "L_CURLY"
         }
         
         self.antiKeyword = { # token types to python, only requires different syntax
@@ -71,11 +87,16 @@ class Lexer:
             "PRINT": "print",
             "PRINTLN": "print*",
             "COMMENT": "# ",
+            "COMMA": ",",
+            "FUNCTION": "def",
+            "L_CURLY": ":",
+            "ELSEIF": "elif",
         }
         
         self.syntaxTree = {
             # "PRINT": "cout(\"\'_\"\')",
             "PRINT": "cout(\"_\")",
+            "FUNCTION": "funct",
         }
         
         self.tokens = []
@@ -126,12 +147,11 @@ class Lexer:
                 self.tokens.append([token.group(0), tokenType])
                 
                 spaces = " "*(5-len(str(operations)))
-                spaces2 = " "*(10-len(str(token.group(0))))
+                spaces2 = " "*(10-len(str(repr(token.group(0)))))
                 # print(f"{operations}{spaces}|  {token}{spaces2}|  {tokenType}")
-                print(f"{operations}{spaces}|  {token.group(0)}{spaces2}|  {tokenType}")
+                print(f"{operations}{spaces}|  {repr(token.group(0))}{spaces2}|  {tokenType}")
                 
             except:
-                print(".",currentCharacter,".")
                 self.currentPosition += 1
         
             operations += 1
@@ -142,7 +162,6 @@ class Lexer:
     def parser(self, tokens) -> str:
         self.execution = time.time()
         operations = 0
-        backtrack = 0 # used just for println
         idx = 0
         result = ""
         

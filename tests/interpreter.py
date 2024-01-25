@@ -25,6 +25,7 @@ class Lexer():
             
             r'\for': 'LOOP',
             r'\print': 'PRINT',
+            r'\if': 'IF',
         }
         
         self.charToRegex = {

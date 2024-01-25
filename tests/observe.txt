@@ -8,7 +8,9 @@ for ( int i = 0 ; i ++ until i <= 10 ) { }
 
 
 template:
-for ( int _ = _ | _ __ until _ __ _) { }
+for ( int _ = _ | _ __ until _ __ _) { 
+
+}
 
 
 turns into:

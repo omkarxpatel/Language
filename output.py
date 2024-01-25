@@ -1,4 +1,15 @@
-# // print(10//5, end="") 
-print(40)
-print(10, end="")
-print("hi"*5, end="")
+def hi(x , y) :
+    if (x > y) :
+        print(x)
+    
+
+    elif (x == y) :
+        print("same")
+    
+
+    else :
+        print(y)
+    
+
+
+hi(10 , 10)
