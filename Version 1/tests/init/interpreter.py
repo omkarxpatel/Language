@@ -1,3 +1,6 @@
+# v0, process I used to tokenize wasnt the best
+# so i changed it up for v1
+
 import re, os, sys, time
 from colorama import Fore as f, init
 
