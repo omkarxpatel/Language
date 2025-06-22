@@ -38,4 +38,23 @@ Here is what the `output.py` file looks like after execution:
 ```py
 print("hello", end="")
 ```
+
+Example usecase:
+```py
+funct hi(x | y) {
+    if (x > y) {
+        coutln(x)
+    }
+
+    elseif (x == y) {
+        coutln("same")
+    }
+
+    else {
+        coutln(y)
+    }
+}
+
+hi(10 | 10)
+```
 Now, for version 2 of the code, we will be making our own version of the python `exec()` function along with many other things such as error & syntax handling, custom syntax & keywords, and converting the source code directly into assembly.
